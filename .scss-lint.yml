@@ -1,0 +1,22 @@
+scss_files:
+  - 'app/assets/stylesheets/**/*.scss'
+exclude:
+  - 'vendor/**/*'
+  - 'node_modules/**/*'
+linters:
+  PropertySortOrder:
+    enabled: false
+  ColorVariable:
+    enabled: false
+  DeclarationOrder:
+    enabled: false
+  EmptyRule:
+    enabled: false
+  PlaceholderInExtend:
+    enabled: false
+  DuplicateProperty:
+    enabled: true
+    ignore_consecutive: true
+  ElsePlacement:
+    enabled: true
+    style: new_line

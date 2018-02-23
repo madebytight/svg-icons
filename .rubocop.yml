@@ -1,0 +1,23 @@
+Documentation:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Metrics/LineLength:
+  Exclude:
+    - config/routes.rb
+Metrics/BlockLength:
+  Exclude:
+    - app/admin/**/*.rb
+
+AllCops:
+  Exclude:
+    - node_modules/**/*
+    - script/**/*
+    - bin/**/*
+    - db/**/*
