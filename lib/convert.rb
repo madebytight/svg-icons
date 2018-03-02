@@ -14,6 +14,7 @@ class Convert
 
   def convert
     puts "  #{input} -> #{output}:"
+    ensure_output_folder
     clean_svg
     replace_strokes
     replace_fills
@@ -21,6 +22,13 @@ class Convert
   end
 
   private
+
+  def ensure_output_folder
+    output_folder = output.gsub(%r{\/[^\/]+$}, '')
+    return if Dir.exist?(output_folder)
+    puts "    -> Create output folder: #{output_folder}"
+    FileUtils.mkdir_p(output_folder)
+  end
 
   def clean_svg
     puts '    -> Run svgo'

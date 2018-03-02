@@ -1,6 +1,6 @@
 require './lib/convert'
 
-task default: [:convert] do
+task default: [:clean_output, :convert] do
   puts "\n\n==== New SVG files: ====\n\n"
 
   Dir['output/**/*.svg'].each do |file|
@@ -9,7 +9,7 @@ task default: [:convert] do
   end
 end
 
-task js: [:convert] do
+task js: [:clean_output, :convert] do
   dst = 'output/icons.js'
   svgs = {}
   Dir['output/**/*.svg'].each do |file|
@@ -26,7 +26,7 @@ task js: [:convert] do
   f.write("export default {\n")
   lines = []
   svgs.each do |name, svg|
-    lines << "  #{name}: '#{svg}'"
+    lines << "  '#{name}': '#{svg}'"
   end
   f.write(lines.join(",\n") + "\n")
   f.write("};\n")
@@ -41,8 +41,36 @@ task :convert do
   end
 end
 
-task :clean do
-  Dir['{input,output}/**/*.*'].each do |file|
+task clean: %i[clean_input clean_output]
+
+task :clean_input do
+  Dir.chdir('input')
+
+  # Remove folders
+  Dir['*/'].each do |dir|
+    FileUtils.rm_rf(dir)
+  end
+
+  # Remove files
+  Dir['**/*.*'].each do |file|
     File.delete(file)
   end
+
+  Dir.chdir('..')
+end
+
+task :clean_output do
+  Dir.chdir('output')
+
+  # Remove folders
+  Dir['*/'].each do |dir|
+    FileUtils.rm_rf(dir)
+  end
+
+  # Remove files
+  Dir['**/*.*'].each do |file|
+    File.delete(file)
+  end
+
+  Dir.chdir('..')
 end
