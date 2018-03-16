@@ -27,7 +27,7 @@ task js: [:clean_output, :convert] do
 
   f.write("export default {\n")
   lines = []
-  svgs.each do |name, svg|
+  Hash[svgs.sort].each do |name, svg|
     lines << "  '#{name}': '#{svg}'"
   end
   f.write(lines.join(",\n") + "\n")
