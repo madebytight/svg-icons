@@ -42,7 +42,6 @@ task :convert do
   Dir['input/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
     Convert.convert(file, color_map)
-    break
   end
 end
 
