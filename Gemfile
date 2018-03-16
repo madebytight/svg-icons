@@ -1,2 +1,3 @@
-gem 'rake'
 gem 'nokogiri'
+gem 'pry'
+gem 'rake'

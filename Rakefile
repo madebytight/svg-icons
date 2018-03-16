@@ -1,3 +1,4 @@
+require './lib/color_map'
 require './lib/convert'
 
 task default: [:clean_output, :convert] do
@@ -13,6 +14,7 @@ task js: [:clean_output, :convert] do
   dst = 'output/icons.js'
   svgs = {}
   Dir['output/**/*.svg'].each do |file|
+    next if file =~ /colorMap\.svg/
     name = file.gsub(%r{^output/}, '')
                .gsub(/\.svg$/, '')
     content = File.read(file)
@@ -36,8 +38,11 @@ end
 
 task :convert do
   puts 'Convert icons:'
+  color_map = ColorMap.new('input/colorMap.svg')
   Dir['input/**/*.svg'].each do |file|
-    Convert.convert(file)
+    next if file =~ /colorMap\.svg/
+    Convert.convert(file, color_map)
+    break
   end
 end
 

@@ -13,7 +13,7 @@ Metrics/LineLength:
     - config/routes.rb
 Metrics/BlockLength:
   Exclude:
-    - app/admin/**/*.rb
+    - **/*.rake
 
 AllCops:
   Exclude:
