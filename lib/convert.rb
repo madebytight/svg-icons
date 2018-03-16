@@ -43,7 +43,7 @@ class Convert
       color = node['stroke']
       node.remove_attribute('stroke')
       suffix = color_map.suffix_for(color)
-      node['class'] = [node['class'], "stroke#{suffix}"].join(' ')
+      node['class'] = "#{node['class']} #{"stroke#{suffix}"}".strip
     end
   end
 
@@ -55,7 +55,7 @@ class Convert
       color = node['fill']
       node.remove_attribute('fill')
       suffix = color_map.suffix_for(color)
-      node['class'] = [node['class'], "fill#{suffix}"].join(' ')
+      node['class'] = "#{node['class']} #{"fill#{suffix}"}".strip
     end
   end
 
