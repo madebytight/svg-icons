@@ -25,6 +25,12 @@ class ColorMap
     "-#{closest}"
   end
 
+  def each
+    map.each do |color, name|
+      yield(name, color)
+    end
+  end
+
   private
 
   def build_color_map

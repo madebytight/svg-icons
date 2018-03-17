@@ -33,7 +33,8 @@ class Convert
 
   def clean_svg
     puts '    -> Run svgo'
-    `svgo #{input} -o #{output} --pretty`
+    args = "#{input} -o #{output} --pretty --indent 2"
+    `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
   end
 
   def replace_strokes

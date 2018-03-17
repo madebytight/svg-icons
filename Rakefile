@@ -1,5 +1,6 @@
 require './lib/color_map'
 require './lib/convert'
+require './lib/indent'
 
 task default: [:clean_output, :convert] do
   puts "\n\n==== New SVG files: ====\n\n"
@@ -36,6 +37,36 @@ task js: [:clean_output, :convert] do
   puts "\nWritten to #{dst}"
 end
 
+task preview: [:clean_output, :convert] do
+  puts 'Create preview:'
+  dst = 'output/preview.html'
+  color_map = ColorMap.new('input/colorMap.svg')
+  icons = ""
+  Dir['output/**/*.svg'].each do |file|
+    next if file =~ /colorMap\.svg/
+    content = File.read(file)
+    icons << "<div class=\"icon\">\n"
+    icons << content.indent(2) + "\n"
+    icons << "</div>\n"
+  end
+
+  rules = []
+  color_map.each do |name, color|
+    rules << ".icon .fill-#{name} { fill: #{color}; }"
+    rules << ".icon .stroke-#{name} { stroke: #{color}; }"
+  end
+
+  template = File.read('preview_template.html')
+
+  colors_indent = template.match(/^( +)\/\* COLORS \*\//)[1].length
+  template.gsub!(/^ +\/\* COLORS \*\//, rules.join("\n").indent(colors_indent))
+
+  icons_indent = template.match(/^( +)<!-- ICONS -->/)[1].length
+  template.gsub!(/^ +<!-- ICONS -->/, icons.indent(icons_indent))
+  puts template
+  File.open(dst, 'w') {|f| f.write(template) }
+end
+
 task :convert do
   puts 'Convert icons:'
   color_map = ColorMap.new('input/colorMap.svg')
@@ -45,7 +76,9 @@ task :convert do
   end
 end
 
-task clean: %i[clean_input clean_output]
+task clean: %i[clean_input clean_output] do
+
+end
 
 task :clean_input do
   Dir.chdir('input')

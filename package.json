@@ -1,0 +1,12 @@
+{
+  "name": "svg-icons",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/madebytight/svg-icons.git",
+  "author": "Anders Svendal <anders.svendal@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "svgo": "^1.0.5"
+  }
+}
