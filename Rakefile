@@ -63,8 +63,8 @@ task preview: [:clean_output, :convert] do
 
   icons_indent = template.match(/^( +)<!-- ICONS -->/)[1].length
   template.gsub!(/^ +<!-- ICONS -->/, icons.indent(icons_indent))
-  puts template
   File.open(dst, 'w') {|f| f.write(template) }
+  `open #{dst}`
 end
 
 task :convert do
