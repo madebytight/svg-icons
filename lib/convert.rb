@@ -1,15 +1,16 @@
 require 'nokogiri'
 
 class Convert
-  attr_accessor :input, :output
+  attr_accessor :input, :output, :color_map
 
-  def initialize(file)
+  def initialize(file, color_map)
     self.input = file
     self.output = file.gsub(/^input/, 'output')
+    self.color_map = color_map
   end
 
-  def self.convert(file)
-    new(file).convert
+  def self.convert(file, color_map)
+    new(file, color_map).convert
   end
 
   def convert
@@ -32,15 +33,18 @@ class Convert
 
   def clean_svg
     puts '    -> Run svgo'
-    `svgo #{input} -o #{output} --pretty`
+    args = "#{input} -o #{output} --pretty --indent 2"
+    `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
   end
 
   def replace_strokes
     puts '    -> Replace strokes'
     each_node do |node|
       next unless node['stroke']
+      color = node['stroke']
       node.remove_attribute('stroke')
-      node['class'] = 'stroke'
+      suffix = color_map.suffix_for(color)
+      node['class'] = "#{node['class']} #{"stroke#{suffix}"}".strip
     end
   end
 
@@ -49,8 +53,10 @@ class Convert
     each_node do |node|
       next unless node['fill']
       next if node['fill'] == 'none'
+      color = node['fill']
       node.remove_attribute('fill')
-      node['class'] = 'fill'
+      suffix = color_map.suffix_for(color)
+      node['class'] = "#{node['class']} #{"fill#{suffix}"}".strip
     end
   end
 
@@ -66,7 +72,7 @@ class Convert
   end
 
   def each_node
-    svg = File.open(output, "r") { |f| Nokogiri::XML(f) }
+    svg = File.open(output, 'r') { |f| Nokogiri::XML(f) }
     svg.traverse do |node|
       yield(node)
     end
