@@ -1,5 +1,6 @@
 require 'pry'
 require 'nokogiri'
+require 'active_support/inflector'
 
 require_relative 'color'
 
@@ -52,7 +53,7 @@ class ColorMap
   end
 
   def convert_name(name)
-    name.gsub(/^color/, '').downcase
+    name.gsub(/^color/, '').underscore.dasherize
   end
 
   def convert_color(color)
