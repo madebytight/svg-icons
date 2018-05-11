@@ -1,7 +1,7 @@
 require 'nokogiri'
 
 class Convert
-  attr_accessor :input, :output, :color_map
+  attr_accessor :input, :output, :color_map, :element_classes
 
   def initialize(file, color_map)
     self.input = file
@@ -16,7 +16,9 @@ class Convert
   def convert
     puts "  #{input} -> #{output}:"
     ensure_output_folder
+    map_class_names
     clean_svg
+    inject_class_names
     replace_strokes
     replace_fills
     replace_dimensions
@@ -25,7 +27,7 @@ class Convert
   private
 
   def ensure_output_folder
-    output_folder = output.gsub(%r{\/[^\/]+$}, '')
+    output_folder = output.gsub(/\/[^\/]+$/, '')
     return if Dir.exist?(output_folder)
     puts "    -> Create output folder: #{output_folder}"
     FileUtils.mkdir_p(output_folder)
@@ -33,7 +35,12 @@ class Convert
 
   def clean_svg
     puts '    -> Run svgo'
-    args = "#{input} -o #{output} --pretty --indent 2"
+    options = [
+      '--pretty',
+      '--indent 2',
+      '--disable=mergePaths'
+    ]
+    args = "#{input} -o #{output} #{options.join(' ')}"
     `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
   end
 
@@ -71,11 +78,52 @@ class Convert
     end
   end
 
-  def each_node
-    svg = File.open(output, 'r') { |f| Nokogiri::XML(f) }
+  def map_class_names
+    indexes = {}
+    classes = []
+    each_node(input) do |node|
+      type = node_type(node)
+      indexes[type] ||= -1
+      indexes[type] += 1
+      next if node[:id].nil?
+      next unless node[:id].start_with?('.')
+      classes << {
+        type: type,
+        index: indexes[type],
+        class: node[:id][1..-1]
+      }
+    end
+    self.element_classes = classes
+  end
+
+  def inject_class_names
+    return if element_classes.length.zero?
+    ending = element_classes.count == 1 ? 'class name' : 'class names'
+    puts "    -> Inject #{element_classes.count} #{ending}"
+    svg = read_svg(output)
+    element_classes.each do |element_class|
+      type = element_class[:type]
+      index = element_class[:index]
+      svg.css(type)[index][:class] = element_class[:class]
+    end
+    File.write(output, svg.root.to_s)
+  end
+
+  def each_node(filename = nil)
+    filename = output if filename.nil?
+    svg = read_svg(filename)
     svg.traverse do |node|
       yield(node)
     end
     File.write(output, svg.root.to_s)
+  end
+
+  def read_svg(filename)
+    File.open(filename, 'r') { |f| Nokogiri::XML(f) }
+  end
+
+  def node_type(node)
+    return 'path' if ['polyline', 'polygon'].include?(node.name)
+    node.name
   end
 end
