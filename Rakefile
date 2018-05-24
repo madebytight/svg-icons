@@ -16,7 +16,7 @@ task js: [:clean_output, :convert] do
   svgs = {}
   Dir['output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
-    name = file.gsub(%r{^output/}, '')
+    name = file.gsub(/^output\//, '')
                .gsub(/\.svg$/, '')
     content = File.read(file)
                   .delete("\n") # Remove newlines
@@ -41,7 +41,7 @@ task preview: [:clean_output, :convert] do
   puts 'Create preview:'
   dst = 'output/preview.html'
   color_map = ColorMap.new('input/colorMap.svg')
-  icons = ""
+  icons = ''
   Dir['output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
     content = File.read(file)
@@ -63,7 +63,7 @@ task preview: [:clean_output, :convert] do
 
   icons_indent = template.match(/^( +)<!-- ICONS -->/)[1].length
   template.gsub!(/^ +<!-- ICONS -->/, icons.indent(icons_indent))
-  File.open(dst, 'w') {|f| f.write(template) }
+  File.open(dst, 'w') { |f| f.write(template) }
   `open #{dst}`
 end
 
@@ -76,8 +76,7 @@ task :convert do
   end
 end
 
-task clean: %i[clean_input clean_output] do
-
+task clean: [:clean_input, :clean_output] do
 end
 
 task :clean_input do

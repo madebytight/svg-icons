@@ -7,13 +7,18 @@ Style/EmptyMethod:
   EnforcedStyle: expanded
 Style/FrozenStringLiteralComment:
   Enabled: false
+Style/RegexpLiteral:
+  EnforcedStyle: slashes
+  AllowInnerSlashes: true
+Style/SymbolArray:
+  EnforcedStyle: brackets
 
 Metrics/LineLength:
   Exclude:
     - config/routes.rb
 Metrics/BlockLength:
   Exclude:
-    - **/*.rake
+    - '**/*.rake'
 
 AllCops:
   Exclude:
