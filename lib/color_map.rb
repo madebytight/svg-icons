@@ -57,7 +57,6 @@ class ColorMap
   end
 
   def convert_color(color)
-    return "##{color[1] * 6}" if color.squeeze.length == 2
-    color
+    Color.hex(color)
   end
 end
