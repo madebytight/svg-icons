@@ -38,7 +38,8 @@ class Convert
     options = [
       '--pretty',
       '--indent 2',
-      '--disable=mergePaths'
+      '--disable=mergePaths',
+      '--disable=convertPathData'
     ]
     args = "#{input} -o #{output} #{options.join(' ')}"
     `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
