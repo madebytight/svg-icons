@@ -13,6 +13,10 @@ class ColorMap
     build_color_map
   end
 
+  def exist?
+    File.exist?(file_name)
+  end
+
   def suffix_for(color)
     color = convert_color(color)
     return "-#{map[color]}" unless map[color].nil?
@@ -35,6 +39,8 @@ class ColorMap
   private
 
   def build_color_map
+    return unless exist?
+
     each_node do |node|
       next if node[:id] == 'colorMap'
       next unless node[:id] =~ /color[A-Za-z]+/
@@ -45,7 +51,8 @@ class ColorMap
   end
 
   def each_node
-    return unless File.exist?(file_name)
+    return unless exist?
+
     svg = File.open(file_name, 'r') { |f| Nokogiri::XML(f) }
     svg.traverse do |node|
       yield(node)

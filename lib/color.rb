@@ -70,6 +70,7 @@ class Color
 
   def sanitize(raw)
     return named_color(raw) if named_color?(raw)
+
     raw = "##{raw[1] * 6}" if raw.squeeze.length == 2
     raw
   end

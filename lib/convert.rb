@@ -46,6 +46,8 @@ class Convert
   end
 
   def replace_strokes
+    return unless color_map.exist?
+
     puts '    -> Replace strokes'
     each_node do |node|
       next unless node['stroke']
@@ -57,6 +59,8 @@ class Convert
   end
 
   def replace_fills
+    return unless color_map.exist?
+
     puts '    -> Replace fills'
     each_node do |node|
       next unless node['fill']
