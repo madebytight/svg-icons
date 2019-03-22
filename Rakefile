@@ -16,6 +16,7 @@ task js: [:clean_output, :convert] do
   svgs = {}
   Dir['output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
+
     name = file.gsub(/^output\//, '')
                .gsub(/\.svg$/, '')
     content = File.read(file)
@@ -25,7 +26,7 @@ task js: [:clean_output, :convert] do
   end
 
   f = File.open(dst, 'w')
-
+  f.write("/* eslint max-len: off */\n\n")
   f.write("export default {\n")
   lines = []
   Hash[svgs.sort].each do |name, svg|
@@ -44,6 +45,7 @@ task preview: [:clean_output, :convert] do
   icons = ''
   Dir['output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
+
     content = File.read(file)
     icons << "<div class=\"icon\">\n"
     icons << content.indent(2) + "\n"
@@ -72,6 +74,7 @@ task :convert do
   color_map = ColorMap.new('input/colorMap.svg')
   Dir['input/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
+
     Convert.convert(file, color_map)
   end
 end
