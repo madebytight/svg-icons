@@ -1,5 +1,7 @@
 require 'nokogiri'
 
+require_relative './id_map'
+
 class Convert
   attr_accessor :input, :output, :color_map, :element_classes
 
@@ -19,6 +21,7 @@ class Convert
     map_class_names
     clean_svg
     inject_class_names
+    replace_ids
     replace_strokes
     replace_fills
     replace_dimensions
@@ -43,6 +46,21 @@ class Convert
     ]
     args = "#{input} -o #{output} #{options.join(' ')}"
     `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
+  end
+
+  def replace_ids
+    puts '    -> Replace ids'
+    ids = IdMap.new
+
+    each_node do |node|
+      unless node['clip-path'].nil?
+        node['clip-path'] = ids.convert_clip_path(node['clip-path'])
+      end
+
+      if ids.include?(node['id'])
+        node['id'] = ids.convert_id(node['id'])
+      end
+    end
   end
 
   def replace_strokes
