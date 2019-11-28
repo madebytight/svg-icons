@@ -38,6 +38,33 @@ task js: [:clean_output, :convert] do
   puts "\nWritten to #{dst}"
 end
 
+task json: [:clean_output, :convert] do
+  dst = 'output/icons.json'
+  svgs = {}
+  svgs = {}
+  Dir['output/**/*.svg'].each do |file|
+    next if file =~ /colorMap\.svg/
+
+    name = file.gsub(/^output\//, '')
+               .gsub(/\.svg$/, '')
+    content = File.read(file)
+                  .delete("\n") # Remove newlines
+                  .gsub(/ {2,}/, '') # Remove whitespace between tags
+    svgs[name] = content
+  end
+
+  f = File.open(dst, 'w')
+  f.write("{\n")
+  lines = []
+  Hash[svgs.sort].each do |name, svg|
+    lines << "  \"#{name}\": \"#{svg.gsub('"', '\"')}\""
+  end
+  f.write(lines.join(",\n") + "\n")
+  f.write("}\n")
+
+  puts "\nWritten to #{dst}"
+end
+
 task preview: [:clean_output, :convert] do
   puts 'Create preview:'
   dst = 'output/preview.html'
