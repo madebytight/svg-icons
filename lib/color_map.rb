@@ -60,7 +60,10 @@ class ColorMap
   end
 
   def convert_name(name)
-    name.gsub(/^color/, '').underscore.dasherize
+    name.gsub(/^color/, '')
+        .underscore
+        .gsub(/([^0-9])([0-9])/, '\1_\2')
+        .dasherize
   end
 
   def convert_color(color)
