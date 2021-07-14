@@ -2,13 +2,7 @@ require './lib/color_map'
 require './lib/convert'
 require './lib/indent'
 
-task default: [:clean_output, :convert] do
-  puts "\n\n==== New SVG files: ====\n\n"
-
-  Dir['/output/**/*.svg'].each do |file|
-    puts File.read(file)
-    puts ''
-  end
+task default: [:usage] do
 end
 
 task js: [:clean_output, :convert] do
@@ -139,4 +133,20 @@ task :clean_output do
   end
 
   Dir.chdir('..')
+end
+
+task :usage do
+  image_name = 'madebytight/svg-icons'
+  cmd = [
+    'docker run --rm',
+    '-v $(pwd)/input:/input',
+    '-v $(pwd)/output:/output',
+    image_name
+  ].join(' ')
+
+
+  puts "\n\nUsage:\n"
+  puts "#{cmd} rake json     -- Export to JSON"
+  puts "#{cmd} rake js       -- Export to JavaScript"
+  puts "#{cmd} rake preview  -- Create preview in HTML"
 end

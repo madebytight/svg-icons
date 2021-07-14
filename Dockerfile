@@ -18,4 +18,4 @@ COPY --chown=app:app . .
 # COPY docker-entrypoint.sh /usr/local/bin/
 # ENTRYPOINT ["docker-entrypoint.sh"]
 
-CMD ["echo", "hei"]
+CMD ["rake"]
