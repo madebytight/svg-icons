@@ -7,7 +7,7 @@ class Convert
 
   def initialize(file, color_map)
     self.input = file
-    self.output = file.gsub(/^input/, 'output')
+    self.output = file.gsub(/input/, 'output')
     self.color_map = color_map
   end
 
@@ -45,7 +45,7 @@ class Convert
       '--disable=convertPathData'
     ]
     args = "#{input} -o #{output} #{options.join(' ')}"
-    `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
+    `/app/node_modules/.bin/svgo #{args}`
   end
 
   def replace_ids

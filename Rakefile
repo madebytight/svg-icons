@@ -5,16 +5,16 @@ require './lib/indent'
 task default: [:clean_output, :convert] do
   puts "\n\n==== New SVG files: ====\n\n"
 
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/output/**/*.svg'].each do |file|
     puts File.read(file)
     puts ''
   end
 end
 
 task js: [:clean_output, :convert] do
-  dst = 'output/icons.js'
+  dst = '/output/icons.js'
   svgs = {}
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
     name = file.gsub(/^output\//, '')
@@ -39,10 +39,10 @@ task js: [:clean_output, :convert] do
 end
 
 task json: [:clean_output, :convert] do
-  dst = 'output/icons.json'
+  dst = '/output/icons.json'
   svgs = {}
   svgs = {}
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
     name = file.gsub(/^output\//, '')
@@ -67,10 +67,10 @@ end
 
 task preview: [:clean_output, :convert] do
   puts 'Create preview:'
-  dst = 'output/preview.html'
-  color_map = ColorMap.new('input/colorMap.svg')
+  dst = '/output/preview.html'
+  color_map = ColorMap.new('/input/colorMap.svg')
   icons = ''
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/output/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
     content = File.read(file)
@@ -85,7 +85,7 @@ task preview: [:clean_output, :convert] do
     rules << ".icon .stroke-#{name} { stroke: #{color}; }"
   end
 
-  template = File.read('preview_template.html')
+  template = File.read('/app/preview_template.html')
 
   colors_indent = template.match(/^( +)\/\* COLORS \*\//)[1].length
   template.gsub!(/^ +\/\* COLORS \*\//, rules.join("\n").indent(colors_indent))
@@ -93,13 +93,13 @@ task preview: [:clean_output, :convert] do
   icons_indent = template.match(/^( +)<!-- ICONS -->/)[1].length
   template.gsub!(/^ +<!-- ICONS -->/, icons.indent(icons_indent))
   File.open(dst, 'w') { |f| f.write(template) }
-  `open #{dst}`
+  # `open #{dst}`
 end
 
 task :convert do
   puts 'Convert icons:'
-  color_map = ColorMap.new('input/colorMap.svg')
-  Dir['input/**/*.svg'].each do |file|
+  color_map = ColorMap.new('/input/colorMap.svg')
+  Dir['/input/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
     Convert.convert(file, color_map)
@@ -110,15 +110,15 @@ task clean: [:clean_input, :clean_output] do
 end
 
 task :clean_input do
-  Dir.chdir('input')
+  Dir.chdir('/input')
 
   # Remove folders
-  Dir['*/'].each do |dir|
+  Dir['/input/*/'].each do |dir|
     FileUtils.rm_rf(dir)
   end
 
   # Remove files
-  Dir['**/*.*'].each do |file|
+  Dir['/input/**/*.*'].each do |file|
     File.delete(file)
   end
 
@@ -126,15 +126,15 @@ task :clean_input do
 end
 
 task :clean_output do
-  Dir.chdir('output')
+  Dir.chdir('/output')
 
   # Remove folders
-  Dir['*/'].each do |dir|
+  Dir['/output/*/'].each do |dir|
     FileUtils.rm_rf(dir)
   end
 
   # Remove files
-  Dir['**/*.*'].each do |file|
+  Dir['/output/**/*.*'].each do |file|
     File.delete(file)
   end
 

@@ -1,0 +1,20 @@
+# Docker files
+./.dockerignore
+./Dockerfile*
+./docker-*.yml
+
+# Git
+.git
+.git*
+*.orig
+
+# Generated files
+./node_modules
+./input
+./output
+
+# Temporary files
+./log
+./tmp
+!./log/.keep
+!./tmp/.keep
