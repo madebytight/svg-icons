@@ -2,22 +2,16 @@ require './lib/color_map'
 require './lib/convert'
 require './lib/indent'
 
-task default: [:clean_output, :convert] do
-  puts "\n\n==== New SVG files: ====\n\n"
-
-  Dir['output/**/*.svg'].each do |file|
-    puts File.read(file)
-    puts ''
-  end
+task default: [:usage] do
 end
 
-task js: [:clean_output, :convert] do
-  dst = 'output/icons.js'
+task js: [:clean_tmp, :convert] do
+  dst = '/app/output/icons.js'
   svgs = {}
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/app/tmp/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
-    name = file.gsub(/^output\//, '')
+    name = file.gsub(/^\/app\/tmp\//, '')
                .gsub(/\.svg$/, '')
     content = File.read(file)
                   .delete("\n") # Remove newlines
@@ -38,14 +32,14 @@ task js: [:clean_output, :convert] do
   puts "\nWritten to #{dst}"
 end
 
-task json: [:clean_output, :convert] do
-  dst = 'output/icons.json'
+task json: [:clean_tmp, :convert] do
+  dst = '/app/output/icons.json'
   svgs = {}
   svgs = {}
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/app/tmp/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
-    name = file.gsub(/^output\//, '')
+    name = file.gsub(/^\/app\/tmp\//, '')
                .gsub(/\.svg$/, '')
     content = File.read(file)
                   .delete("\n") # Remove newlines
@@ -65,12 +59,12 @@ task json: [:clean_output, :convert] do
   puts "\nWritten to #{dst}"
 end
 
-task preview: [:clean_output, :convert] do
+task preview: [:clean_tmp, :convert] do
   puts 'Create preview:'
-  dst = 'output/preview.html'
-  color_map = ColorMap.new('input/colorMap.svg')
+  dst = '/app/output/preview.html'
+  color_map = ColorMap.new('/app/input/colorMap.svg')
   icons = ''
-  Dir['output/**/*.svg'].each do |file|
+  Dir['/app/tmp/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
     content = File.read(file)
@@ -85,7 +79,7 @@ task preview: [:clean_output, :convert] do
     rules << ".icon .stroke-#{name} { stroke: #{color}; }"
   end
 
-  template = File.read('preview_template.html')
+  template = File.read('/app/preview_template.html')
 
   colors_indent = template.match(/^( +)\/\* COLORS \*\//)[1].length
   template.gsub!(/^ +\/\* COLORS \*\//, rules.join("\n").indent(colors_indent))
@@ -93,13 +87,14 @@ task preview: [:clean_output, :convert] do
   icons_indent = template.match(/^( +)<!-- ICONS -->/)[1].length
   template.gsub!(/^ +<!-- ICONS -->/, icons.indent(icons_indent))
   File.open(dst, 'w') { |f| f.write(template) }
-  `open #{dst}`
+
+  puts '-> Done'
 end
 
 task :convert do
   puts 'Convert icons:'
-  color_map = ColorMap.new('input/colorMap.svg')
-  Dir['input/**/*.svg'].each do |file|
+  color_map = ColorMap.new('/app/input/colorMap.svg')
+  Dir['/app/input/**/*.svg'].each do |file|
     next if file =~ /colorMap\.svg/
 
     Convert.convert(file, color_map)
@@ -110,15 +105,15 @@ task clean: [:clean_input, :clean_output] do
 end
 
 task :clean_input do
-  Dir.chdir('input')
+  Dir.chdir('/app/input')
 
   # Remove folders
-  Dir['*/'].each do |dir|
+  Dir['/app/input/*/'].each do |dir|
     FileUtils.rm_rf(dir)
   end
 
   # Remove files
-  Dir['**/*.*'].each do |file|
+  Dir['/app/input/**/*.*'].each do |file|
     File.delete(file)
   end
 
@@ -126,17 +121,49 @@ task :clean_input do
 end
 
 task :clean_output do
-  Dir.chdir('output')
+  Dir.chdir('/app/output')
 
   # Remove folders
-  Dir['*/'].each do |dir|
+  Dir['/app/output/*/'].each do |dir|
+    next if dir =~ /output\/input/
+
     FileUtils.rm_rf(dir)
   end
 
   # Remove files
-  Dir['**/*.*'].each do |file|
+  Dir['/app/output/**/*.*'].each do |file|
+    next if file =~ /output\/input/
+
     File.delete(file)
   end
 
   Dir.chdir('..')
+end
+
+task :clean_tmp do
+  Dir.chdir('/app/tmp')
+
+  # Remove folders
+  Dir['/app/tmp/*/'].each do |dir|
+    FileUtils.rm_rf(dir)
+  end
+
+  # Remove files
+  Dir['/app/tmp/**/*.*'].each do |file|
+    File.delete(file)
+  end
+
+  Dir.chdir('..')
+end
+
+task :usage do
+  puts <<~USAGE
+    Usage:
+      docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output madebytight/svg-icons COMMAND
+
+    Commands:
+      json      Export to JSON
+      js        Export to JavaScript
+      preview   Create preview in HTML
+  USAGE
 end

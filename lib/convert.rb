@@ -7,7 +7,7 @@ class Convert
 
   def initialize(file, color_map)
     self.input = file
-    self.output = file.gsub(/^input/, 'output')
+    self.output = file.gsub(/input/, 'tmp')
     self.color_map = color_map
   end
 
@@ -16,7 +16,7 @@ class Convert
   end
 
   def convert
-    puts "  #{input} -> #{output}:"
+    puts "  #{name}:"
     ensure_output_folder
     map_class_names
     clean_svg
@@ -29,11 +29,13 @@ class Convert
 
   private
 
+  def name
+    input.to_s.gsub(/.+\/input\//, '')
+  end
+
   def ensure_output_folder
     output_folder = output.gsub(/\/[^\/]+$/, '')
-    return if Dir.exist?(output_folder)
-    puts "    -> Create output folder: #{output_folder}"
-    FileUtils.mkdir_p(output_folder)
+    FileUtils.mkdir_p(output_folder) unless Dir.exist?(output_folder)
   end
 
   def clean_svg
@@ -45,7 +47,7 @@ class Convert
       '--disable=convertPathData'
     ]
     args = "#{input} -o #{output} #{options.join(' ')}"
-    `#{Dir.pwd}/node_modules/.bin/svgo #{args}`
+    `/app/node_modules/.bin/svgo #{args}`
   end
 
   def replace_ids
